@@ -1,0 +1,74 @@
+name: 🎮 DOOM — Process Move
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  process-move:
+    runs-on: ubuntu-latest
+    if: |
+      contains(fromJSON('["w","s","a","d","shoot","fire","e","reset"]'),
+               github.event.issue.title)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Apply command & render frame
+        run: |
+          CMD="${{ github.event.issue.title }}"
+          echo "Processing command: $CMD"
+          python engine/raycaster.py "$CMD"
+
+      - name: Commit updated frame and state
+        run: |
+          git config user.name  "doom-bot"
+          git config user.email "doom-bot@users.noreply.github.com"
+          git add frame.svg state/game.json
+          git diff --staged --quiet || git commit -m "🎮 [${{ github.event.issue.title }}] frame update by @${{ github.event.issue.user.login }}"
+          git push
+
+      - name: Close issue with result
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const cmd = context.payload.issue.title;
+            const actor = context.payload.issue.user.login;
+
+            const comments = {
+              'w':     '⬆️ **moved forward** — frame updated!',
+              's':     '⬇️ **moved back** — frame updated!',
+              'a':     '⬅️ **turned left** — frame updated!',
+              'd':     '➡️ **turned right** — frame updated!',
+              'shoot': '🔫 **BANG!** — frame updated!',
+              'fire':  '🔫 **BANG!** — frame updated!',
+              'e':     '🔫 **BANG!** — frame updated!',
+              'reset': '🔄 **game reset** — back to start!',
+            };
+
+            const reply = comments[cmd] ?? '✅ command processed';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: `@${actor} ${reply}\n\n[→ See the new frame in README](https://github.com/${context.repo.owner}/${context.repo.repo}#readme)`
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              issue_number: context.payload.issue.number,
+              state: 'closed'
+            });

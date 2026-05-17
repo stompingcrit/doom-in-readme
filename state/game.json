@@ -1,0 +1,36 @@
+{
+  "x": 2.5,
+  "y": 2.5,
+  "angle": 0.0,
+  "health": 100,
+  "ammo": 50,
+  "kills": 0,
+  "messages": [],
+  "enemies": [
+    {
+      "x": 10.5,
+      "y": 5.5,
+      "alive": true
+    },
+    {
+      "x": 15.5,
+      "y": 10.5,
+      "alive": true
+    },
+    {
+      "x": 5.5,
+      "y": 15.5,
+      "alive": true
+    },
+    {
+      "x": 17.5,
+      "y": 3.5,
+      "alive": true
+    },
+    {
+      "x": 8.5,
+      "y": 12.5,
+      "alive": true
+    }
+  ]
+}
