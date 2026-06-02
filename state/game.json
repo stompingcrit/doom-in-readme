@@ -1,11 +1,12 @@
 {
-  "x": 3.3,
+  "x": 3.6999999999999997,
   "y": 2.5,
   "angle": 0.0,
   "health": 100,
   "ammo": 50,
   "kills": 0,
   "messages": [
+    "moved forward",
     "moved forward",
     "moved forward"
   ],
